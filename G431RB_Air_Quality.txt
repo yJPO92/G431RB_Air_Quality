@@ -1,0 +1,72 @@
+Configuration	G431RB_Air_Quality
+STM32CubeMX 	6.4.0
+Date	01/31/2022
+MCU	STM32G431RBTx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+LPUART1	Asynchronous	LPUART1_RX	PA3
+LPUART1	Asynchronous	LPUART1_TX	PA2
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
+TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13	GPIO_EXTI13	BP1 [blue push button]
+14	PA2	LPUART1_TX	LPUART1_TX
+17	PA3	LPUART1_RX	LPUART1_RX
+19	PA5	GPIO_Output	LD2 [green]
+49	PA13	SYS_JTMS-SWDIO	T_SWDIO
+50	PA14	SYS_JTCK-SWCLK	T_SWCLK
+56	PB3*	SYS_JTDO-SWO	T_SWO
+PERIPHERALS	MODES	FUNCTIONS	PINS
+LPUART1	Asynchronous	LPUART1_RX	PA3
+LPUART1	Asynchronous	LPUART1_TX	PA2
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
+TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13	GPIO_EXTI13	BP1 [blue push button]
+14	PA2	LPUART1_TX	LPUART1_TX
+17	PA3	LPUART1_RX	LPUART1_RX
+19	PA5	GPIO_Output	LD2 [green]
+49	PA13	SYS_JTMS-SWDIO	T_SWDIO
+50	PA14	SYS_JTCK-SWCLK	T_SWCLK
+56	PB3*	SYS_JTDO-SWO	T_SWO
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : G431RB_Air_Quality
+Project Folder : D:\GitDepots\G431RB_Air_Quality
+Toolchain / IDE : STM32CubeIDE
+Firmware Package Name and Version : STM32Cube FW_G4 V1.4.0
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy only the necessary library files
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : Yes
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+

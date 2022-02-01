@@ -1,0 +1,28 @@
+*****************************
+Air_Quality_spec.txt
+ Created on: Feb 1, 2022
+     Author: Jean
+*****************************
+
+Serial Protocol
+All communication is at 9600 baud 8N1.
+Commands are a single letter with no terminating character or line feed required.
+Any extraneous command characters are ignored by the board.
+Some commands are followed by a response from the board within a few milliseconds.
+The responses are variable length and terminated with a \n character.
+
+Command		Response
+  t			t=23.45\n returns the temperature in degrees C as a float
+  c			c=400\n returns the eCOS level in ppm as an int
+  b			no response turn the buzzer on
+  q			no response turn the buzzer off
+  a			no response auto-mode. Use the LED display to automatically
+				show the current eCO2 level
+  m			no response manual-mode. Turn off the auto mode, prior to
+				setting the LED display level manually
+  0-6		no response turn on the LED for the level indicated (0 no LEDs,
+				1 lowest LED, 6 highest LED). Note onlt 1 LED
+				can be lit at a time.
+  ?			undocumented Use at your own risk. Don't use.
+
+				
