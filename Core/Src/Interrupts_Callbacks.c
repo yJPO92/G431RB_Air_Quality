@@ -20,10 +20,11 @@
 //#include <math.h>
 #include "tim.h"
 #include "usart.h"
+#include "dma.h"
 
 
 //extern UART_HandleTypeDef huart2;
-//extern DMA_HandleTypeDef hdma_usart2_rx;
+extern DMA_HandleTypeDef hdma_uart4_rx;
 //extern DMA_HandleTypeDef hdma_usart2_tx;
 
 //extern yMENU_t mnuSTM;
@@ -57,6 +58,7 @@ void Interrputs_Init(void) {
 
 	//--- start UART4
 	//** Activer reception juqu'au char '\n'
+    UART4->CR2 |= 0x0A000000;
 	__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
 	HAL_UART_Receive_DMA(&huart4, bRxBuffer, 20);
 
@@ -106,8 +108,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	/** USART4 - Air Quality Kit interface */
 	if (huart->Instance == UART4) {
 			__NOP();
-			//snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %c\r\n", bRxBuffer[0]);
-			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			snprintf(aTxBuffer, 1024, "\n\tdebug: UART4 callback ");
+			HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			//** Re Activer la reception interrupt sur caractere \n
+			//if (UART4->ISR & USART_ISR_CMF) {
+				snprintf(aTxBuffer, 1024, "\n\t\trecu from other uart4 %s", bRxBuffer);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				//reset UART DMA RX
+				__HAL_DMA_DISABLE(&hdma_uart4_rx);
+				huart4.gState = HAL_UART_STATE_READY;
+				huart4.RxState = HAL_UART_STATE_READY;
+				__HAL_UART_CLEAR_FLAG(&huart4, UART_CLEAR_CMF);
+				__HAL_UART_SEND_REQ(&huart4, UART_RXDATA_FLUSH_REQUEST);
+				//huart4.hdmarx->Instance->CNDTR = 0;
+				hdma_uart4_rx.Instance->CNDTR = 0;
+				memset(bRxBuffer,0,20);	//- Zero Receiving Buffer
+				__HAL_DMA_ENABLE(&hdma_uart4_rx);
+				__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
+			   (void)HAL_UART_Receive_DMA(&huart4, (uint8_t *)bRxBuffer, 20);
+			//}
+
 	}//if usart4
 
 	/** LPUART1 - console interface */
@@ -119,7 +139,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		__HAL_UART_CLEAR_IT(&hlpuart1, UART_CLEAR_CTSF);
 		__HAL_UART_ENABLE_IT(&hlpuart1, UART_IT_RXNE);
 		HAL_UART_Receive_IT(&hlpuart1, aRxBuffer, uart2NbCar);
-	}
+	}//if lpuart1
 
 	/** manage an other usart if any! */
 
@@ -151,15 +171,17 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 }	//callback uart TX
 
 
-///**
-//* @brief This function handles DMA RX interrupt request.
-//* @param None
-//* @retval None
-//*/
-//void USARTx_DMA_RX_IRQHandler(void)
-//{
-//HAL_DMA_IRQHandler(huart2.hdmarx);
-//}
+/**
+ * @brief This function handles UART4 DMA RX interrupt request.
+ * @param None
+ * @retval None
+ */
+void USARTx_DMA_RX_IRQHandler(void)
+{
+	snprintf(aTxBuffer, 1024, "\n\tdebug: DMA UART4 irq ");
+	HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	HAL_DMA_IRQHandler(huart4.hdmarx);
+}
 
 
 ///**

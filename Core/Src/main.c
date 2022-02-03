@@ -87,9 +87,9 @@ uint8_t yAirQual;			//code to interface with AirQual file
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 extern void Interrputs_Init(void);
-//extern int _write(int fd, char *str, int len); // External function prototypes (defined in syscalls.c)
 
 /* USER CODE END PFP */
 
@@ -130,6 +130,9 @@ int main(void)
   MX_LPUART1_UART_Init();
   MX_DMA_Init();
   MX_UART4_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
   /* message de bienvenue */
@@ -137,7 +140,7 @@ int main(void)
   HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
   //test led Led on Nucleo
-  for (int ii = 0; ii < 10; ++ii) {
+  for (int ii = 0; ii < 20; ++ii) {
 	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 	  HAL_Delay(30);
 	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
@@ -174,20 +177,22 @@ int main(void)
 		  case 't': case 'T':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
 			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-
-
 			  break;
 		  case 'c': case 'C':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'b': case 'B':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'q': case 'Q':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'a': case 'A':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'm': case 'M':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
@@ -195,6 +200,7 @@ int main(void)
 		  case '0': case '1': case '2': case '3':
 		  case '4': case '5': case '6':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 
 		  default:
@@ -202,7 +208,6 @@ int main(void)
 			  break;
 		  }
 		  yCarRecu = '*';
-		  //snprintf(aTxBuffer, 1024, "\n---- (re)Start prog ---\n");
 		  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	  }
     /* USER CODE END WHILE */
@@ -254,6 +259,20 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* UART4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(UART4_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(UART4_IRQn);
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
