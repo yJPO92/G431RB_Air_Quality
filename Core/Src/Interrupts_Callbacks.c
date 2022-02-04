@@ -57,8 +57,11 @@ void Interrputs_Init(void) {
 
 	//--- start UART4
 	//** Activer reception juqu'au char '\n'
+    //UART4->CR2 |= 0x0A000000;
+	__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
 	__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-	HAL_UART_Receive_DMA(&huart4, bRxBuffer, 20);
+	HAL_UART_Receive_IT(&huart4, bRxBuffer, 5);
+	//HAL_UART_Receive_DMA(&huart4, bRxBuffer, 20);
 
 	//--- enable DMA on USART2
 	//??
@@ -105,9 +108,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	/** USART4 - Air Quality Kit interface */
 	if (huart->Instance == UART4) {
-			__NOP();
-			//snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %c\r\n", bRxBuffer[0]);
-			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+		__NOP();
+		if (UART4->ISR & USART_ISR_CMF) {
+			snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %s\r\n", bRxBuffer);
+			HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			//* re activer la reception jusqu'a "'\n'
+			__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
+			__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
+			memset(bRxBuffer,0,5);		//- Zero Receiving Buffer
+			HAL_UART_Receive_IT(&huart4, bRxBuffer, 5);
+		}
 	}//if usart4
 
 	/** LPUART1 - console interface */

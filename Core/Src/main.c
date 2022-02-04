@@ -19,7 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "dma.h"
 #include "usart.h"
 #include "tim.h"
 #include "gpio.h"
@@ -79,7 +78,7 @@ char aTxBuffer[1024];		//uart1 debug buffer d'emission
 uint16_t uart2NbCar;		//nb de byte attendu
 uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
 
-uint8_t bRxBuffer[20];		//2nd uart4 buffer de reception
+uint8_t bRxBuffer[5];		//2nd uart4 buffer de reception
 char bTxBuffer[1];			//2nd uart4 buffer d'emission
 uint8_t yAirQual;			//code to interface with AirQual file
 
@@ -128,7 +127,6 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM1_Init();
   MX_LPUART1_UART_Init();
-  MX_DMA_Init();
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 
@@ -174,27 +172,31 @@ int main(void)
 		  case 't': case 'T':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
 			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-
-
 			  break;
 		  case 'c': case 'C':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'b': case 'B':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'q': case 'Q':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'a': case 'A':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case 'm': case 'M':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 		  case '0': case '1': case '2': case '3':
 		  case '4': case '5': case '6':
 			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
+			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 
 		  default:
@@ -202,7 +204,6 @@ int main(void)
 			  break;
 		  }
 		  yCarRecu = '*';
-		  //snprintf(aTxBuffer, 1024, "\n---- (re)Start prog ---\n");
 		  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	  }
     /* USER CODE END WHILE */

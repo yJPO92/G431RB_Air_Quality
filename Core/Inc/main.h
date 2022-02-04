@@ -58,7 +58,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define yCubeMX "2-1"
+#define yCubeMX "2-3"
 #define BP1_Pin GPIO_PIN_13
 #define BP1_GPIO_Port GPIOC
 #define BP1_EXTI_IRQn EXTI15_10_IRQn
@@ -80,7 +80,7 @@ void Error_Handler(void);
 #define T_SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** G431 Air Qual ***"
-#define yVER  "2.0"
+#define yVER  "2.3"
 #define yDATE "xx-Feb-2022"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 

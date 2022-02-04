@@ -45,7 +45,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern uint8_t bRxBuffer[20];		//2nd uart4 buffer de reception
+extern uint8_t bRxBuffer[5];		//2nd uart4 buffer de reception
 extern char aTxBuffer[1024];		//uart1 debug buffer d'emission
 
 /* USER CODE END PV */
@@ -61,7 +61,6 @@ extern char aTxBuffer[1024];		//uart1 debug buffer d'emission
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_uart4_rx;
 extern UART_HandleTypeDef hlpuart1;
 extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim1;
@@ -208,20 +207,6 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 channel1 global interrupt.
-  */
-void DMA1_Channel1_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_uart4_rx);
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel1_IRQn 1 */
-}
-
-/**
   * @brief This function handles TIM1 break interrupt and TIM15 global interrupt.
   */
 void TIM1_BRK_TIM15_IRQHandler(void)
@@ -268,11 +253,12 @@ void EXTI15_10_IRQHandler(void)
   */
 void UART4_IRQHandler(void)
 {
-	/* USER CODE BEGIN UART4_IRQn 0 */
+  /* USER CODE BEGIN UART4_IRQn 0 */
 
-	/* USER CODE END UART4_IRQn 0 */
-	HAL_UART_IRQHandler(&huart4);
-	/* USER CODE BEGIN UART4_IRQn 1 */
+  /* USER CODE END UART4_IRQn 0 */
+  HAL_UART_IRQHandler(&huart4);
+  /* USER CODE BEGIN UART4_IRQn 1 */
+/*
 	if (UART4->ISR & USART_ISR_CMF) {
 		snprintf(aTxBuffer, 1024, "\n\t\trecu from other uart %s", bRxBuffer);
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -284,15 +270,16 @@ void UART4_IRQHandler(void)
 		__HAL_UART_SEND_REQ(&huart4, UART_RXDATA_FLUSH_REQUEST);
 		//huart4.hdmarx->Instance->CNDTR = 0;
 		hdma_uart4_rx.Instance->CNDTR = 0;
-		//memset(bRxBuffer,0,20);	//- Zero Receiving Buffer
+		//memset(bRxBuffer,0,5);	//- Zero Receiving Buffer
 		__HAL_DMA_ENABLE(&hdma_uart4_rx);
 		__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-	   (void)HAL_UART_Receive_DMA(&huart4, (uint8_t *)bRxBuffer, 20);
+	   (void)HAL_UART_Receive_DMA(&huart4, (uint8_t *)bRxBuffer, 5);
 	}
 
 	HAL_UART_IRQHandler(&huart4);
+*/
 
-	/* USER CODE END UART4_IRQn 1 */
+  /* USER CODE END UART4_IRQn 1 */
 }
 
 /**
@@ -307,20 +294,6 @@ void LPUART1_IRQHandler(void)
   /* USER CODE BEGIN LPUART1_IRQn 1 */
 
   /* USER CODE END LPUART1_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMAMUX overrun interrupt.
-  */
-void DMAMUX_OVR_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMAMUX_OVR_IRQn 0 */
-
-  /* USER CODE END DMAMUX_OVR_IRQn 0 */
-
-  /* USER CODE BEGIN DMAMUX_OVR_IRQn 1 */
-
-  /* USER CODE END DMAMUX_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
