@@ -12,6 +12,10 @@
  *******************************************************************************
  */
 
+#include "Air_Quality.h"
 
+void yAirQualMenu(void){
+
+}
 
 //That's all folks!!

@@ -28,6 +28,8 @@
 #include "VT100.h"
 #include <stdio.h>
 #include <string.h>
+#include "Air_Quality.h"
+
 //Quelle est la cible?
 //with '-fno-diagnostics-show-caret'
 #define __STR2__(x) #x
@@ -73,14 +75,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+//Console interface (et debug print)
 uint8_t aRxBuffer[3];		//uart1 debug buffer de reception
 char aTxBuffer[1024];		//uart1 debug buffer d'emission
 uint16_t uart2NbCar;		//nb de byte attendu
 uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
 
-uint8_t bRxBuffer[5];		//2nd uart4 buffer de reception
-char bTxBuffer[1];			//2nd uart4 buffer d'emission
-uint8_t yAirQual;			//code to interface with AirQual file
 
 /* USER CODE END PV */
 
@@ -151,6 +151,10 @@ int main(void)
   							"\n" DECSC);
   HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
+  //--- display menu
+  snprintf(aTxBuffer, 1024, mmenu1);
+  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+
   //--- initialize interrupts & start uart receive it
   uart2NbCar = 1;
   Interrputs_Init();
@@ -199,6 +203,9 @@ int main(void)
 			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 			  break;
 
+		  case 'w': case 'W':
+			  yAirQualMenu();
+			  break;
 		  default:
 			  snprintf(aTxBuffer, 1024, "\t\tcommande erronee %c\r\n", yCarRecu);
 			  break;

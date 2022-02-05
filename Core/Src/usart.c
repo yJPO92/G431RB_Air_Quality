@@ -189,8 +189,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(UART4_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspInit 1 */
-    UART4->CR2 |= 0x0A000000;					//attendre caractere '\n'
-    __HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);	//interrupt qd car recu
+    //selectionner caractere d'interrupt avant de demarrer uart ('\n')
+    UART4->CR2 |= 0x0A000000;
+//    __HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);	//interrupt qd car recu
   /* USER CODE END UART4_MspInit 1 */
   }
 }

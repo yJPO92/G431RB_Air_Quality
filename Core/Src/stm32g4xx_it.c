@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "usart.h"
+#include "Air_Quality.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +47,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern uint8_t bRxBuffer[5];		//2nd uart4 buffer de reception
+//extern uint8_t bRxBuffer[5];		//2nd uart4 buffer de reception
 extern char aTxBuffer[1024];		//uart1 debug buffer d'emission
 
 /* USER CODE END PV */
@@ -62,7 +64,7 @@ extern char aTxBuffer[1024];		//uart1 debug buffer d'emission
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef hlpuart1;
-extern UART_HandleTypeDef huart4;
+//extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim1;
 /* USER CODE BEGIN EV */
 
@@ -270,10 +272,10 @@ void UART4_IRQHandler(void)
 		__HAL_UART_SEND_REQ(&huart4, UART_RXDATA_FLUSH_REQUEST);
 		//huart4.hdmarx->Instance->CNDTR = 0;
 		hdma_uart4_rx.Instance->CNDTR = 0;
-		//memset(bRxBuffer,0,5);	//- Zero Receiving Buffer
+		//memset(bRxBuffer,0,aqRxBufferSize);	//- Zero Receiving Buffer
 		__HAL_DMA_ENABLE(&hdma_uart4_rx);
 		__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-	   (void)HAL_UART_Receive_DMA(&huart4, (uint8_t *)bRxBuffer, 5);
+	   (void)HAL_UART_Receive_DMA(&huart4, (uint8_t *)bRxBuffer, aqRxBufferSize);
 	}
 
 	HAL_UART_IRQHandler(&huart4);

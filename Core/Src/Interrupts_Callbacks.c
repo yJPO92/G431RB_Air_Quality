@@ -20,25 +20,14 @@
 //#include <math.h>
 #include "tim.h"
 #include "usart.h"
+#include "Air_Quality.h"
 
-
-//extern UART_HandleTypeDef huart2;
-//extern DMA_HandleTypeDef hdma_usart2_rx;
-//extern DMA_HandleTypeDef hdma_usart2_tx;
-
-//extern yMENU_t mnuSTM;
-
-//extern uint8_t aTxBuffer[];
-
-//pour debug print
-char aTxBuffer[1024];
+//Console interface (et debug print)
+extern char aTxBuffer[1024];
 extern uint8_t aRxBuffer[3];		//buffer de reception
 extern uint16_t uart2NbCar;			//nb de byte attendu
 extern uint8_t yCarRecu;			//caractere recu
-
-extern uint8_t bRxBuffer[20];		//2nd uart4 buffer de reception
-extern char bTxBuffer[1];			//2nd uart4 buffer d'emission
-extern uint8_t yAirQual;			//code to interface with AirQual file
+uint8_t i = 0;
 
 /* Real Time Clock */
 //RTC_TimeTypeDef nr_Time;
@@ -58,10 +47,12 @@ void Interrputs_Init(void) {
 	//--- start UART4
 	//** Activer reception juqu'au char '\n'
     //UART4->CR2 |= 0x0A000000;
-	__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
-	__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-	HAL_UART_Receive_IT(&huart4, bRxBuffer, 5);
-	//HAL_UART_Receive_DMA(&huart4, bRxBuffer, 20);
+	//__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
+	//__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
+	__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
+	HAL_UART_Receive_IT(&huart4, bRxBuffer, aqRxBufferSize);
+	//HAL_UART_Receive(&huart4, bRxBuffer, aqRxBufferSize, 5000);	//for test
+	//HAL_UART_Receive_DMA(&huart4, bRxBuffer, aqRxBufferSize);
 
 	//--- enable DMA on USART2
 	//??
@@ -110,13 +101,30 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if (huart->Instance == UART4) {
 		__NOP();
 		if (UART4->ISR & USART_ISR_CMF) {
-			snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %s\r\n", bRxBuffer);
+			yAirQual[i] = bRxBuffer[0];
+			i =0;
+			snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %s\r\n", yAirQual);
 			HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			//* re activer la reception jusqu'a "'\n'
-			__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
-			__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-			memset(bRxBuffer,0,5);		//- Zero Receiving Buffer
-			HAL_UART_Receive_IT(&huart4, bRxBuffer, 5);
+			memset(yAirQual,0,yAirQualSize);			//- Zero Interface Buffer
+			//memset(bRxBuffer,0,aqRxBufferSize);		//- Zero Receiving Buffer
+			huart4.Instance->CR1 |= 0x00004000;		// set CMIE
+			__HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_TC + UART_FLAG_CMF + UART_FLAG_RXNE);
+			//__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
+			__HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_CMF);
+			__HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE + UART_IT_CM);
+			HAL_UART_Receive_IT(&huart4, bRxBuffer, 1);
+
+//			//* re activer la reception jusqu'a "'\n'
+//			__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
+//			__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
+//			memset(bRxBuffer,0,aqRxBufferSize);		//- Zero Receiving Buffer
+//			HAL_UART_Receive_IT(&huart4, bRxBuffer, aqRxBufferSize);
+		} else {
+			//strcat(yAirQual,bRxBuffer[0]);
+			yAirQual[i] = bRxBuffer[0];
+			i++;
+			__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
+			HAL_UART_Receive_IT(&huart4, bRxBuffer, 1);
 		}
 	}//if usart4
 
