@@ -262,7 +262,7 @@ void UART4_IRQHandler(void)
   /* USER CODE BEGIN UART4_IRQn 1 */
 /*
 	if (UART4->ISR & USART_ISR_CMF) {
-		snprintf(aTxBuffer, 1024, "\n\t\trecu from other uart %s", bRxBuffer);
+		snprintf(aTxBuffer, 1024, DECRC "\n\t\trecu from other uart %s", bRxBuffer);
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		//reset UART DMA RX
 		__HAL_DMA_DISABLE(&hdma_uart4_rx);

@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -76,8 +76,8 @@
 
 /* USER CODE BEGIN PV */
 //Console interface (et debug print)
-uint8_t aRxBuffer[3];		//uart1 debug buffer de reception
-char aTxBuffer[1024];		//uart1 debug buffer d'emission
+uint8_t aRxBuffer[3];		//lpuart1 debug buffer de reception
+char aTxBuffer[1024];		//lpuart1 debug buffer d'emission
 uint16_t uart2NbCar;		//nb de byte attendu
 uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
 
@@ -88,180 +88,194 @@ uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 extern void Interrputs_Init(void);
-//extern int _write(int fd, char *str, int len); // External function prototypes (defined in syscalls.c)
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/*
+ * General Welcome and signing display
+ */
+void DisplayWelcome(void) {
+	snprintf(aTxBuffer, 1024, clrscr homescr
+			"\nBonjour maitre!"
+			"\n(c)Jean92, " yDATE
+			"\n" yPROG " " yVER " (" yCubeMX ")"
+			"\nCompil: " __TIME__ " le " __DATE__
+			"\nSTmicro NUCLEO_G431RB"
+			"\n" DECSC);
+	HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+}
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-	  yCarRecu = '*';
-  /* USER CODE END 1 */
+	/* USER CODE BEGIN 1 */
+	yCarRecu = '*';
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_TIM1_Init();
-  MX_LPUART1_UART_Init();
-  MX_UART4_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_TIM1_Init();
+	MX_LPUART1_UART_Init();
+	MX_UART4_Init();
+	/* USER CODE BEGIN 2 */
 
-  /* message de bienvenue */
-  snprintf(aTxBuffer, 1024, "\n---- (re)Start prog ---\n");
-  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	/* message de bienvenue */
+	snprintf(aTxBuffer, 1024, "\n---- (re)Start prog ---\n");
+	HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 
-  //test led Led on Nucleo
-  for (int ii = 0; ii < 10; ++ii) {
-	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
-	  HAL_Delay(30);
-	  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
-	  HAL_Delay(30);
-  }
+	//test led Led on Nucleo
+	for (int ii = 0; ii < 30; ++ii) {
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		HAL_Delay(30);
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		HAL_Delay(30);
+	}
 
-  snprintf(aTxBuffer, 1024, clrscr homescr
-  		  	  	  	  	    "\nBonjour maitre!"
-  		  	  	  	  	    "\n(c)Jean92, " yDATE
-  							"\n" yPROG " " yVER " (" yCubeMX ")"
-  						    "\nCompil: " __TIME__ " le " __DATE__
-  						    "\nSTmicro NUCLEO_G431RB"
-  							"\n" DECSC);
-  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	DisplayWelcome();
 
-  //--- display menu
-  snprintf(aTxBuffer, 1024, mmenu1);
-  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	//--- display menu
+	yAirQualMenu();
 
-  //--- initialize interrupts & start uart receive it
-  uart2NbCar = 1;
-  Interrputs_Init();
+	//--- initialize interrupts & start uart receive it
+	uart2NbCar = 1;
+	Interrputs_Init();
 
-  HAL_Delay(500);
+	HAL_Delay(500);
 
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  // check command received (see Air_Quality_Spec.txt)
-	  if (yCarRecu != '*') {
-		  switch (yCarRecu) {
-		  case 'e': case 'E':
-			  snprintf(aTxBuffer, 1024, "\t\ttry repetitif read\r\n");
-			  break;
-		  case 't': case 'T':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case 'c': case 'C':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case 'b': case 'B':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case 'q': case 'Q':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case 'a': case 'A':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case 'm': case 'M':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
-		  case '0': case '1': case '2': case '3':
-		  case '4': case '5': case '6':
-			  snprintf(aTxBuffer, 1024, "\t\tsend %c to other usart\r\n", yCarRecu);
-			  HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			  break;
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1)
+	{
+		// check command received (see Air_Quality_Spec.txt)
+		if (yCarRecu != '*') {
+			switch (yCarRecu) {
+			//--- Air Quality cmd
+			case 't': case 'T':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'c': case 'C':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'b': case 'B':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'q': case 'Q':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'a': case 'A':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'm': case 'M':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case '0': case '1': case '2': case '3':
+			case '4': case '5': case '6':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+				//--- cmd supplementaire
+			case 'r': case 'R':
+				snprintf(aTxBuffer, 1024, "\tlecture en continu (in progress)" ERASELINE DECRC);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
 
-		  case 'w': case 'W':
-			  yAirQualMenu();
-			  break;
-		  default:
-			  snprintf(aTxBuffer, 1024, "\t\tcommande erronee %c\r\n", yCarRecu);
-			  break;
-		  }
-		  yCarRecu = '*';
-		  HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-	  }
-    /* USER CODE END WHILE */
+				//--- cmd console
+			case 'd': case 'D':		//-- re afficher le menu
+				DisplayWelcome();
+				yAirQualMenu();
+				break;
+			case 's': case 'S':		//-- shutdown
+				//todo cmd Shutbown
+				snprintf(aTxBuffer, 1024, "\tin progress" ERASELINE DECRC);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			default:
+				snprintf(aTxBuffer, 1024, "\tcommande erronee" ERASELINE "\n" ERASELINE DECRC);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			}
+			yCarRecu = '*';
+			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);	//echo console
+		}
+		/* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+	RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Configure the main internal regulator output voltage
-  */
-  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 85;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
-  RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV4;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	/** Configure the main internal regulator output voltage
+	 */
+	HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
+	/** Initializes the RCC Oscillators according to the specified parameters
+	 * in the RCC_OscInitTypeDef structure.
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
+	RCC_OscInitStruct.PLL.PLLN = 85;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+	RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+	RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV4;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/** Initializes the CPU, AHB and APB buses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+			|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+	{
+		Error_Handler();
+	}
 }
 
 /* USER CODE BEGIN 4 */
@@ -269,34 +283,34 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+	/* USER CODE BEGIN 6 */
+	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+	/* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

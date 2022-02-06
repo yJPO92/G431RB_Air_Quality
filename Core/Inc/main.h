@@ -80,7 +80,7 @@ void Error_Handler(void);
 #define T_SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** G431 Air Qual ***"
-#define yVER  "2.4"
+#define yVER  "2.6"
 #define yDATE "xx-Feb-2022"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 

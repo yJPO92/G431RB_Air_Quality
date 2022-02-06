@@ -21,6 +21,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "Air_Quality.h"
+#include "VT100.h"
 
 //Console interface (et debug print)
 extern char aTxBuffer[1024];
@@ -82,7 +83,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	/** PC13 GPIO_EXTI13 (B1 blue button) */
 	if(GPIO_Pin == BP1_Pin) {
-		snprintf(aTxBuffer, 1024, "\tdebug: BP1 down\r\n");
+		snprintf(aTxBuffer, 1024, DECRC "\tdebug: BP1 down\r\n");
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 	}
 
@@ -103,24 +104,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		if (UART4->ISR & USART_ISR_CMF) {
 			yAirQual[i] = bRxBuffer[0];
 			i =0;
-			snprintf(aTxBuffer, 1024, "\tdebug: recu from uart4 %s\r\n", yAirQual);
-			HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-			memset(yAirQual,0,yAirQualSize);			//- Zero Interface Buffer
-			//memset(bRxBuffer,0,aqRxBufferSize);		//- Zero Receiving Buffer
+			//snprintf(aTxBuffer, 1024, DECRC "\tdebug: recu from uart4 %s\r\n", yAirQual);		//debug
+			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);	//debug
+			//-- traiter la reponse
+			yAirQualReceived(yAirQual);
+			memset(yAirQual,0,yAirQualSize);		//- Zero Interface Buffer
+			//-- re activer la reception jusqu'a '\n'
 			huart4.Instance->CR1 |= 0x00004000;		// set CMIE
 			__HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_TC + UART_FLAG_CMF + UART_FLAG_RXNE);
-			//__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
 			__HAL_UART_CLEAR_FLAG(&huart4, UART_FLAG_CMF);
 			__HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE + UART_IT_CM);
 			HAL_UART_Receive_IT(&huart4, bRxBuffer, 1);
-
-//			//* re activer la reception jusqu'a "'\n'
-//			__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
-//			__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
-//			memset(bRxBuffer,0,aqRxBufferSize);		//- Zero Receiving Buffer
-//			HAL_UART_Receive_IT(&huart4, bRxBuffer, aqRxBufferSize);
 		} else {
-			//strcat(yAirQual,bRxBuffer[0]);
 			yAirQual[i] = bRxBuffer[0];
 			i++;
 			__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
@@ -130,7 +125,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	/** LPUART1 - console interface */
 	if (huart->Instance == LPUART1) {
-		snprintf(aTxBuffer, 1024, "\tdebug: keydown %c\r\n", aRxBuffer[0]);
+		snprintf(aTxBuffer, 1024, DECRC "\tdebug: keydown %c " ERASELINE, aRxBuffer[0]);
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		yCarRecu = aRxBuffer[0];	//send back to main prog
 		//** Re Activer la reception sur interrupt
