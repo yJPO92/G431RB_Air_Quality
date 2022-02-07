@@ -2,8 +2,10 @@
 *
 * STM32CubeIDE v1.8.0
 * STM32CubeG4 Firmware Package V1.5.0
+* MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 07-02-2022	v2.6 (2-3): ajout readme.md, license.txt, qqs photos.
 le 06/02/2022	v2.6 (2-3): Connection to Kit (!! la reponse se finie par '\r\n'
 le 05/02/2022	v2.5 (2-3): regroupement fonctions Air Quality Kit, finalisation console interface
 								finalisation simulation Air Quality Kit avec 2nd TeraTerm
