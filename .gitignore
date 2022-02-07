@@ -34,7 +34,7 @@
 # ajout momentanement au versionning
 #/Drivers/
 /Middlewares/
-/Drivers/
+!/Drivers/
 
 # project specifics files (personnal notes & debug helper & node-RED)
 #*.txt

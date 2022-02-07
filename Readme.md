@@ -27,13 +27,13 @@ Implentation de ce protocole dans la carte Nucleo via port UART4.
 *future* ajouter capteur humidité.  
 
 ##### Inputs
-BP1 (interrupt) : *futre use*   
+BP1 (interrupt) : *future use*   
 Console VT100 via debug LPUART1:  
 >Menu des commandes  
 >Affichage des retours du Kit    
 
 ##### Outputs
-Uart4 linked to Air Quality Kit
+Uart4 linked to Air Quality Kit.
 
 ## Program design
 *in progress*
@@ -43,11 +43,9 @@ Uart4 linked to Air Quality Kit
 ##### v2.4: simulation avec une console en lieu et place du kit
 ##### v1.0: creation avec CubeMX
 
-
 ## Authors
 **yJPO92 (Jean92)** - fev. 2022
 
 ## License
-This project is licensed under the [CC0 1.0 Universal](LICENSE.md)
-Creative Commons License - see the [LICENSE.md](LICENSE.md) file for
-details
+This project is licensed under the [CC0 1.0 Universal](LICENSE.md) 
+Creative Commons License - see the [LICENSE.md](LICENSE.md) file for details.  
