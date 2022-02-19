@@ -5,6 +5,16 @@
 * MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 19/02/2022	v2.8 (2-3): gestion lpuart1 (VT100) en hors cnx PC
+							==> JP5 power selector
+							5V_USB_STLK	: alim via USB du PC => OK
+							5V_VIN		: 4xAA sur CN7 22/24 => OK
+							E5V			: 4xAA sur CN6 6/8   => OK
+							5V_USB_CHGR	: sur CN1, fonctionne qq sec!! puis s'arrete
+								si LPUART1 declaré vers VT a travers ST link => prog se coince!
+le 12/02/2022	v2.7 (2-3): a la mise sous tension le prog ne demarre pas completement (uniquement le 1er display
+								et clignotement rapide) pas de display menu ni de blink 1 sec.
+le 08/02/2022			  : commenté et posté sur Elektor.
 le 07-02-2022	v2.6 (2-3): ajout readme.md, license.txt, qqs photos
 le 06/02/2022	v2.6 (2-3): Connection to Kit (!! la reponse se finie par '\r\n')
 le 05/02/2022	v2.5 (2-3): regroupement fonctions Air Quality Kit, finalisation console interface

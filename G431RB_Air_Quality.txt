@@ -1,6 +1,6 @@
 Configuration	G431RB_Air_Quality
 STM32CubeMX 	6.4.0
-Date	01/31/2022
+Date	02/16/2022
 MCU	STM32G431RBTx
 
 
@@ -13,6 +13,8 @@ SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
 SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
 SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
 TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+UART4	Asynchronous	UART4_RX	PC11
+UART4	Asynchronous	UART4_TX	PC10
 
 
 
@@ -23,6 +25,8 @@ Pin Nb	PINs	FUNCTIONs	LABELs
 19	PA5	GPIO_Output	LD2 [green]
 49	PA13	SYS_JTMS-SWDIO	T_SWDIO
 50	PA14	SYS_JTCK-SWCLK	T_SWCLK
+52	PC10	UART4_TX	UART4_TX
+53	PC11	UART4_RX	UART4_RX
 56	PB3*	SYS_JTDO-SWO	T_SWO
 PERIPHERALS	MODES	FUNCTIONS	PINS
 LPUART1	Asynchronous	LPUART1_RX	PA3
@@ -32,6 +36,8 @@ SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
 SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
 SYS	Dead Battery Signals disabled	SYS_VS_DBSignals	VP_SYS_VS_DBSignals
 TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+UART4	Asynchronous	UART4_RX	PC11
+UART4	Asynchronous	UART4_TX	PC10
 
 
 
@@ -42,6 +48,8 @@ Pin Nb	PINs	FUNCTIONs	LABELs
 19	PA5	GPIO_Output	LD2 [green]
 49	PA13	SYS_JTMS-SWDIO	T_SWDIO
 50	PA14	SYS_JTCK-SWCLK	T_SWCLK
+52	PC10	UART4_TX	UART4_TX
+53	PC11	UART4_RX	UART4_RX
 56	PB3*	SYS_JTDO-SWO	T_SWO
 
 
@@ -52,7 +60,7 @@ Project Settings :
 Project Name : G431RB_Air_Quality
 Project Folder : D:\GitDepots\G431RB_Air_Quality
 Toolchain / IDE : STM32CubeIDE
-Firmware Package Name and Version : STM32Cube FW_G4 V1.4.0
+Firmware Package Name and Version : STM32Cube FW_G4 V1.5.0
 
 
 Code Generation Settings : 

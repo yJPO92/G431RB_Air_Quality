@@ -5,11 +5,12 @@
  * @brief   Callback: BP 1, Keyboard, ADC, RTC_AlarmA...
  * @version    
  *******************************************************************************
+ * Modified : 19-02-2022 (deactiver/reactiver lpuart1)
  * Modified : 31-01-2022
  * Created  : 29-08-2020
  *******************************************************************************
- * @note    
- *
+ * @note    le prog se bloque s'il n'y a pas cnx lpuart1 avec alim externe
+ *			parade: deactiver/reactiver lpuart1 via BP1
  *******************************************************************************
  */
 
@@ -47,13 +48,10 @@ void Interrputs_Init(void) {
 
 	//--- start UART4
 	//** Activer reception juqu'au char '\n'
-    //UART4->CR2 |= 0x0A000000;
-	//__HAL_UART_CLEAR_IT(&huart4, UART_CLEAR_CMF);
-	//__HAL_UART_ENABLE_IT(&huart4, UART_IT_CM);
+	//UART4->CR2 |= 0x0A000000;	//pas ici ou syntaxe differente!!!
+	//huart4.Instance->CR2 |= 0x0A000000;	//pas mieux, faut-il stopper l'uart?
 	__HAL_UART_ENABLE_IT(&huart4,UART_IT_RXNE + UART_IT_CM);
 	HAL_UART_Receive_IT(&huart4, bRxBuffer, aqRxBufferSize);
-	//HAL_UART_Receive(&huart4, bRxBuffer, aqRxBufferSize, 5000);	//for test
-	//HAL_UART_Receive_DMA(&huart4, bRxBuffer, aqRxBufferSize);
 
 	//--- enable DMA on USART2
 	//??
@@ -79,12 +77,27 @@ void Interrputs_Init(void) {
   * @param  GPIO_Pin Specifies the port pin connected to corresponding EXTI line.
   * @retval None
   */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+
 	/** PC13 GPIO_EXTI13 (B1 blue button) */
 	if(GPIO_Pin == BP1_Pin) {
 		snprintf(aTxBuffer, 1024, DECRC "\tdebug: BP1 down\r\n");
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+		//-- changer frequence de blink
+		if (htim1.Instance->PSC == 4999) {
+			//- blink lent
+			htim1.Instance->PSC = 20000 - 1;
+			//- deactiver lpuart1
+			HAL_UART_DeInit(&hlpuart1);
+		} else {
+			//- blink rapide
+			htim1.Instance->PSC = 5000 - 1;
+			//- re init et re activer lpuart1
+			HAL_UART_Init(&hlpuart1);
+			uart2NbCar = 1;
+			__HAL_UART_ENABLE_IT(&hlpuart1, UART_IT_RXNE);	//UART read data register not empty interruption (uart2NbCar =1|2|??)
+			HAL_UART_Receive_IT(&hlpuart1, aRxBuffer, uart2NbCar);
+		}
 	}
 
 	/** autre entree interrupt */
@@ -95,8 +108,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  * don't forget to start!
  * 		 __HAL_UART_ENABLE_IT(&hlpuart1, UART_IT_RXNE);	//start USART1
  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 	/** USART4 - Air Quality Kit interface */
 	if (huart->Instance == UART4) {
@@ -143,8 +155,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  * @param  None
  * @retval None
  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+
 	/** USART4 - Air Quality Kit interface */
 	if (huart->Instance == UART4) {
 			__NOP();
@@ -182,7 +194,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 //  */
 //void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 //{
-//	//--- reveill� par RTC AlarmA
+//	//--- reveill par RTC AlarmA
 //	snprintf(mnuSTM.Buffer, 1024, CUP(9,50) "RTC Alarm A flag  ");
 //	HAL_UART_Transmit(&huart2,(uint8_t *) mnuSTM.Buffer, strlen(mnuSTM.Buffer), 5000);
 //	RTC_AlarmA_flag = 1;
@@ -192,7 +204,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
   * @brief  TIMers callback
   * @param
   * @retval status
-*/
+  */
 //yToCheck ==> timer callback
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 

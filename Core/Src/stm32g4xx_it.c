@@ -64,7 +64,7 @@ extern char aTxBuffer[1024];		//uart1 debug buffer d'emission
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef hlpuart1;
-//extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim1;
 /* USER CODE BEGIN EV */
 

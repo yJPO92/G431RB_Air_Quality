@@ -39,11 +39,12 @@ Uart4 linked to Air Quality Kit.
 *in progress*
 
 ## Version
+##### v2.9: gestion lpuart1 si alim par piles
 ##### v2.6: connection et test du Kit 
 ##### v2.4: simulation avec une console en lieu et place du kit
 ##### v1.0: creation avec CubeMX
 
-## Authors
+## Author
 **yJPO92 (Jean92)** - fev. 2022
 
 ## License
