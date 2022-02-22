@@ -5,6 +5,7 @@
 * MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 22/02/2022	v3.0 (2-3): ajout lecture repetitive de Temp et eCO2 sur VT
 le 21/02/2022	v2.9 (2-3):	BP1 toggle VT100 on/off.
 							powered by E5V or VIN MCU blocked because no LPUART1, no blink LD2
 							click on BP1 blink LD2 at 2sec
@@ -18,17 +19,17 @@ le 19/02/2022	v2.8 (2-3): gestion lpuart1 (VT100) en hors cnx PC
 							5V_USB_CHGR	: sur CN1, fonctionne qq sec!! puis s'arrete
 								si LPUART1 declaré vers VT a travers ST link => prog se coince!
 le 12/02/2022	v2.7 (2-3): a la mise sous tension le prog ne demarre pas completement (uniquement le 1er display
-								et clignotement rapide) pas de display menu ni de blink 1 sec.
+							et clignotement rapide) pas de display menu ni de blink 1 sec.
 le 08/02/2022			  : commenté et posté sur Elektor.
 le 07-02-2022	v2.6 (2-3): ajout readme.md, license.txt, qqs photos
 le 06/02/2022	v2.6 (2-3): Connection to Kit (!! la reponse se finie par '\r\n')
 le 05/02/2022	v2.5 (2-3): regroupement fonctions Air Quality Kit, finalisation console interface
-								finalisation simulation Air Quality Kit avec 2nd TeraTerm
-								no commit!!
+							finalisation simulation Air Quality Kit avec 2nd TeraTerm
+							no commit!!
 le 04/02/2022	v2.4 (2-3): Reception message de longueur variable finissant par \n ==> ok
-								ISR_CM ne génére pas d'interrupt mais CMF activé sur caractere \n
-								donc interrupt char by char et check CMF
-								Je suis déçu!!!
+							ISR_CM ne génére pas d'interrupt mais CMF activé sur caractere \n
+							donc interrupt char by char et check CMF
+							Je suis déçu!!!
 le 04/02/2022	v2.3 (2-3): UART4 without DMA ==> tjrs pb.
 [[le 03/02/2022	v2.2 (2.2):	UART4 + DMA, qq modif ==> meme pb]]branch 'with DMA'
 le 02/02/2022	v2.0 (2.1): connection UART4 + DMA vers 2e TeraTerm ==> TX OK, RX one shot!

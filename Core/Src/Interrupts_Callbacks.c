@@ -137,7 +137,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 	/** LPUART1 - console interface */
 	if (huart->Instance == LPUART1) {
-		snprintf(aTxBuffer, 1024, DECRC "\tdebug: keydown %c " ERASELINE, aRxBuffer[0]);
+		snprintf(aTxBuffer, 1024, DECRC "\tchoix %c " ERASELINE, aRxBuffer[0]);
 		HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 		yCarRecu = aRxBuffer[0];	//send back to main prog
 		//** Re Activer la reception sur interrupt
@@ -211,6 +211,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	/** TIM1 - clignotement LD2 */
 	if(htim->Instance == TIM1) {
 		HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
+		yFlagTIM1 = 1;	//timer fired
 	} //TIM1
 
 	/** TIM11 - affichage heure sur LCD */

@@ -81,7 +81,6 @@ char aTxBuffer[1024];		//lpuart1 debug buffer d'emission
 uint16_t uart2NbCar;		//nb de byte attendu
 uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
 
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -159,6 +158,7 @@ int main(void)
 
 	//--- display menu
 	yAirQualMenu();
+	yFlagRepeat = 0;
 
 	//--- initialize interrupts & start uart receive it
 	uart2NbCar = 1;
@@ -172,7 +172,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		// check command received (see Air_Quality_Spec.txt)
+		/* check command received (see Air_Quality_Spec.txt) */
 		if (yCarRecu != '*') {
 			switch (yCarRecu) {
 			//--- Air Quality cmd
@@ -206,9 +206,10 @@ int main(void)
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
 				//--- cmd supplementaire
-			case 'r': case 'R':
-				snprintf(aTxBuffer, 1024, "\tlecture en continu (in progress)" ERASELINE DECRC);
+			case 'r': case 'R':		//-- lecture repetitive de T et eCO2
+				snprintf(aTxBuffer, 1024, "\tLecture continue ('r' pour arreter)" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				yFlagRepeat = !yFlagRepeat;
 				break;
 
 				//--- cmd console
@@ -228,6 +229,14 @@ int main(void)
 			}
 			yCarRecu = '*';
 			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);	//echo console
+		}
+
+		/* lecture repetitve demandee? */
+		if (yFlagRepeat == 1) {
+			if (yFlagTIM1 == 1) {
+				yAirQualRepeatVT();
+				yFlagTIM1 = 0; 	//reset
+			}
 		}
     /* USER CODE END WHILE */
 

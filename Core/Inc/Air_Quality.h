@@ -25,6 +25,8 @@ uint8_t bRxBuffer[aqRxBufferSize];		//buffer de reception
 #define yAirQualSize 15
 uint8_t yAirQual[yAirQualSize];			//code to interface with AirQual file
 uint8_t yTempCos[yAirQualSize];
+uint8_t yFlagRepeat;					//flag lecture repetitive
+uint8_t yFlagTIM1;						//Timer TIM1 fired
 
 /* Menu principal */
 #define mmenu1 "\n\
@@ -44,26 +46,30 @@ uint8_t yTempCos[yAirQualSize];
  Display this menu | Shutdown\n\
  Faire un choix ...\n"
 
-/*
+/**
  *  (Re)Afficher menu
  */
 void yAirQualMenu(void);
 
-/*
+/**
  * Affiche la temperature en 11-40 (lg,col)
  */
 void yAirQualTemp(uint8_t* airqual);
 
-/*
+/**
  * Affiche le niveau de eCOS en 12-40 (lg,col)
  */
 void yAirQualeCOS(uint8_t* airqual);
 
-/*
+/**
  * Traite le message recu du Air Quality Kit
  */
 void yAirQualReceived(uint8_t* airqual);
 
+/**
+ * Lecture repetitive de Temp et eCO2
+ */
+void yAirQualRepeatVT(void);
 
 #endif /* INC_AIR_QUALITY_H_ */
 //That's all folks!!

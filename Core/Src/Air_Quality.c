@@ -16,6 +16,7 @@
 #include "VT100.h"
 #include <stdio.h>
 #include <string.h>
+#include "usart.h"
 
 //lpuart1 PC console
 extern char aTxBuffer[1024];
@@ -57,6 +58,18 @@ void yAirQualReceived(uint8_t* airqual) {
 	if (airqual[0] == 'c') {
 		yAirQualeCOS(yTempCos);
 	}
+}
+
+void yAirQualRepeatVT(void){
+	//-- lire temp
+	snprintf(aTxBuffer, 10, "t");
+	HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+	//-- attendre reponse et traitement
+	HAL_Delay(200);
+	//-- lire eCO2
+	snprintf(aTxBuffer, 10, "c");
+	HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+
 }
 
 
