@@ -5,6 +5,9 @@
 * MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 23/02/2022	v3.1 (3-1): I2C1 Grove LCD RGB ; vma202sw switch On/Off.
+							E5V + 4xAA pas suffisant pour alimenter LCD!
+							5V_VIN + 6LR61 ok
 le 22/02/2022	v3.0 (2-3): ajout lecture repetitive de Temp et eCO2 sur VT
 le 21/02/2022	v2.9 (2-3):	BP1 toggle VT100 on/off.
 							powered by E5V or VIN MCU blocked because no LPUART1, no blink LD2
@@ -43,24 +46,11 @@ vma202 rtc, sw, i2c, spi
 v4.0c, I2C1 ==>Grove LCD RGB ; I2C3 ==> vma202RTC ; check vma202 switch ; no SPI, no FATfs.
 
 PERIPHERALS	MODES	FUNCTIONS	PINS
-I2C1	I2C	I2C1_SCL	PB8
-I2C1	I2C	I2C1_SDA	PB9
-
 I2C3	I2C	I2C3_SCL	PC0
 I2C3	I2C	I2C3_SDA	PC1
 
-USART2	Asynchronous	USART2_RX	PA3
-USART2	Asynchronous	USART2_TX	PA2
-
-
 Pin Nb	PINs	FUNCTIONs	LABELs
-2	PC13	GPIO_EXTI13	B1[btn Bleu]
-
 21	PA5	SPI1_SCK	SPI1_sck
 22	PA6	SPI1_MISO	SPI1_miso
 23	PA7	SPI1_MOSI	SPI1_mosi
 58	PB6	GPIO_Output	SPI1_cs
-
-41	PA8	GPIO_Input	vma202SW
-
-

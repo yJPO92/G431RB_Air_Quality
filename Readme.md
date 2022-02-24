@@ -39,6 +39,7 @@ Uart4 linked to Air Quality Kit.
 *in progress*
 
 ## Version
+##### v3.x: affichage repetitif sur VT100 ou LCD
 ##### v2.9: gestion lpuart1 si alim par piles
 ##### v2.6: connection et test du Kit 
 ##### v2.4: simulation avec une console en lieu et place du kit

@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "usart.h"
 #include "tim.h"
 #include "gpio.h"
@@ -29,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Air_Quality.h"
+#include "yI2CprogsLCD.h"
 
 //Quelle est la cible?
 //with '-fno-diagnostics-show-caret'
@@ -140,6 +142,7 @@ int main(void)
   MX_TIM1_Init();
   MX_LPUART1_UART_Init();
   MX_UART4_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
 	/* message de bienvenue */
@@ -154,16 +157,24 @@ int main(void)
 		HAL_Delay(30);
 	}
 
+	//--- display welcome & menu
 	DisplayWelcome();
-
-	//--- display menu
 	yAirQualMenu();
-	yFlagRepeat = 0;
+	yFlagRepeatVT = 0;
 
 	//--- initialize interrupts & start uart receive it
 	uart2NbCar = 1;
 	Interrputs_Init();
 
+	//--- init LCD, msg de bienvenue
+	yI2C_LCD_init();
+	HAL_Delay(50);
+	yI2C_LCD_locate(0,0); yI2C_LCD_Affich_Txt("* Air Quality *");
+	yI2C_LCD_locate(0,1); yI2C_LCD_Affich_Txt(yVER);
+	yI2C_LCD_locate(7,1); yI2C_LCD_Affich_Txt(__TIME__);
+	HAL_Delay(2000);
+
+	//--- petit delai final
 	HAL_Delay(500);
 
   /* USER CODE END 2 */
@@ -209,7 +220,12 @@ int main(void)
 			case 'r': case 'R':		//-- lecture repetitive de T et eCO2
 				snprintf(aTxBuffer, 1024, "\tLecture continue ('r' pour arreter)" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-				yFlagRepeat = !yFlagRepeat;
+				yFlagRepeatVT = !yFlagRepeatVT;
+				break;
+			case 'l': case 'L':
+				snprintf(aTxBuffer, 1024, "\tLecture continue ('l' pour arreter)" ERASELINE DECRC);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				yFlagRepeatLCD = !yFlagRepeatLCD;
 				break;
 
 				//--- cmd console
@@ -232,12 +248,25 @@ int main(void)
 		}
 
 		/* lecture repetitve demandee? */
-		if (yFlagRepeat == 1) {
+		if (yFlagRepeatVT == 1) {
 			if (yFlagTIM1 == 1) {
 				yAirQualRepeatVT();
 				yFlagTIM1 = 0; 	//reset
 			}
 		}
+		if (yFlagRepeatLCD == 1 || HAL_GPIO_ReadPin(vma202sw_GPIO_Port, vma202sw_Pin) == 1) {
+			if (yFlagTIM1 == 1) {
+				yAirQualRepeatLCD();
+				yFlagTIM1 = 0; 	//reset
+			}
+		}
+
+		/* check vma202 switch */
+		// display on LCD (at end of 2nd line)
+		//snprintf(aTxBuffer, 4, "sw%d",HAL_GPIO_ReadPin(vma202SW_GPIO_Port, vma202SW_Pin));
+		//yI2C_LCD_locate(13,1); yI2C_LCD_Affich_Txt(aTxBuffer);
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

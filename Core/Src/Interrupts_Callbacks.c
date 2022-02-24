@@ -116,8 +116,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		if (UART4->ISR & USART_ISR_CMF) {
 			yAirQual[i] = bRxBuffer[0];
 			i =0;
-			//snprintf(aTxBuffer, 1024, DECRC "\tdebug: recu from uart4 %s\r\n", yAirQual);		//debug
-			//HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);	//debug
+//			snprintf(aTxBuffer, 1024, DECRC "\tdebug: recu from uart4 %s\r\n", yAirQual);		//debug
+//			HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);	//debug
 			//-- traiter la reponse
 			yAirQualReceived(yAirQual);
 			memset(yAirQual,0,yAirQualSize);		//- Zero Interface Buffer
