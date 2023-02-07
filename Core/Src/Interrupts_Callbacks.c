@@ -114,6 +114,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart->Instance == UART4) {
 		__NOP();
 		if (UART4->ISR & USART_ISR_CMF) {
+			//yToCheck ==> inverser les 2 lg suivnate
 			yAirQual[i] = bRxBuffer[0];
 			i =0;
 //			snprintf(aTxBuffer, 1024, DECRC "\tdebug: recu from uart4 %s\r\n", yAirQual);		//debug
