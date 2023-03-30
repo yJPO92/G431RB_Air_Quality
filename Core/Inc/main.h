@@ -86,8 +86,8 @@ void Error_Handler(void);
 #define LCD_i2c1sda_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define yPROG "*** G431 Air Qual ***"
-#define yVER  "3.1c"
-#define yDATE "xx-Feb-2022"
+#define yVER  "3.2"
+#define yDATE "30-Mar-2023"
 //#define yDBG_tk 1        //debug display on terminal (ou commenter ligne)
 
 /* USER CODE END Private defines */

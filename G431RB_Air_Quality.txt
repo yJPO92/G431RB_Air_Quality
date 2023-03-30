@@ -1,6 +1,6 @@
 Configuration	G431RB_Air_Quality
-STM32CubeMX 	6.4.0
-Date	02/23/2022
+STM32CubeMX 	6.7.0
+Date	02/09/2023
 MCU	STM32G431RBTx
 
 
@@ -70,7 +70,7 @@ Project Settings :
 Project Name : G431RB_Air_Quality
 Project Folder : D:\GitDepots\G431RB_Air_Quality
 Toolchain / IDE : STM32CubeIDE
-Firmware Package Name and Version : STM32Cube FW_G4 V1.5.0
+Firmware Package Name and Version : STM32Cube FW_G4 V1.5.1
 
 
 Code Generation Settings : 

@@ -6,18 +6,18 @@
  * @version 1.0
  *******************************************************************************
  * Modified :
- * Created  : 1 févr. 2022
+ * Created  : 1 fevr. 2022
  *******************************************************************************
  * @note    
  *******************************************************************************
  */
 
-#include "Air_Quality.h"
 #include "VT100.h"
 #include <stdio.h>
 #include <string.h>
 #include "usart.h"
 #include "yI2CprogsLCD.h"
+#include "Air_Quality.h"
 
 //lpuart1 PC console
 extern char aTxBuffer[1024];

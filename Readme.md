@@ -15,9 +15,9 @@ Nucleo-G431RB
 ![Le materiel](Air-Quality-Kit_Nucleo-G431RB-min.jpg)
 
 ## Software
-STM32CubeIDE v1.8.0  
+STM32CubeIDE v1.11.2  
 STM32CubeMX  
-STM32CubeG4 Firmware Package V1.5.0  
+STM32CubeG4 Firmware Package V1.5.1  
 Prog C
 
 ## Fonctionnalities

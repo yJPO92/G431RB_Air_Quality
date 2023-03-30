@@ -6,7 +6,7 @@
  * @version 1.0
  *******************************************************************************
  * Modified :
- * Created  : 1 févr. 2022
+ * Created  : 1 fevr. 2022
  *******************************************************************************
  * @note    
  *******************************************************************************
@@ -15,7 +15,7 @@
 #ifndef INC_AIR_QUALITY_H_
 #define INC_AIR_QUALITY_H_
 
-#include "main.h"
+//#include "main.h"
 
 /* Interface with Air Quality Kit */
 // UART4
@@ -28,7 +28,7 @@ uint8_t yAirQual[yAirQualSize];			//code to interface with AirQual file
 uint8_t yTempCos[yAirQualSize];
 uint8_t yFlagRepeatVT;					//flag lecture repetitive
 uint8_t yFlagRepeatLCD;					//flag lecture repetitive
-volatile uint8_t yFlagTIM1;						//Timer TIM1 fired
+volatile uint8_t yFlagTIM1;				//Timer TIM1 fired
 uint8_t yAirQual_Temp[5];				//stockage valeurs
 uint8_t yAirQual_eCO2[7];
 
@@ -82,4 +82,5 @@ void yAirQualRepeatVT(void);
 void yAirQualRepeatLCD(void);
 
 #endif /* INC_AIR_QUALITY_H_ */
+
 //That's all folks!!

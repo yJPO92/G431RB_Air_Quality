@@ -186,20 +186,8 @@ int main(void)
 		/* check command received (see Air_Quality_Spec.txt) */
 		if (yCarRecu != '*') {
 			switch (yCarRecu) {
-			//--- Air Quality cmd
-			case 't': case 'T':
-				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
-				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-				break;
-			case 'c': case 'C':
-				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
-				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-				break;
-			case 'b': case 'B':
-				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
-				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-				break;
-			case 'q': case 'Q':
+			case '0': case '1': case '2': case '3':
+			case '4': case '5': case '6':
 				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
@@ -207,37 +195,46 @@ int main(void)
 				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
-			case 'm': case 'M':
+			case 'b': case 'B':
 				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
-			case '0': case '1': case '2': case '3':
-			case '4': case '5': case '6':
+			case 'c': case 'C':
 				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
-				//--- cmd supplementaire
-			case 'r': case 'R':		//-- lecture repetitive de T et eCO2
-				snprintf(aTxBuffer, 1024, "\tLecture continue ('r' pour arreter)" ERASELINE DECRC);
-				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
-				yFlagRepeatVT = !yFlagRepeatVT;
+			case 'd': case 'D':		//-- re afficher le menu
+				DisplayWelcome();
+				yAirQualMenu();
 				break;
 			case 'l': case 'L':
 				snprintf(aTxBuffer, 1024, "\tLecture continue ('l' pour arreter)" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				yFlagRepeatLCD = !yFlagRepeatLCD;
 				break;
-
-				//--- cmd console
-			case 'd': case 'D':		//-- re afficher le menu
-				DisplayWelcome();
-				yAirQualMenu();
+			case 'm': case 'M':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'q': case 'Q':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+			case 'r': case 'R':		//-- lecture repetitive de T et eCO2
+				snprintf(aTxBuffer, 1024, "\tLecture continue ('r' pour arreter)" ERASELINE DECRC);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				yFlagRepeatVT = !yFlagRepeatVT;
 				break;
 			case 's': case 'S':		//-- shutdown
 				//todo cmd Shutbown
 				snprintf(aTxBuffer, 1024, "\tin progress" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
+			case 't': case 'T':
+				snprintf(aTxBuffer, 1024, "%c", yCarRecu);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+
 			default:
 				snprintf(aTxBuffer, 1024, "\tcommande erronee" ERASELINE "\n" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
