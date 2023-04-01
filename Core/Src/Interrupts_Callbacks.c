@@ -211,7 +211,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 	/** TIM1 - clignotement LD2 */
 	if(htim->Instance == TIM1) {
-		HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
+		HAL_GPIO_TogglePin(vma202LD1_GPIO_Port,vma202LD1_Pin);
 		yFlagTIM1 = 1;	//timer fired
 	} //TIM1
 

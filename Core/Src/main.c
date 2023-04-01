@@ -19,8 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "usart.h"
+#include "spi.h"
 #include "tim.h"
 #include "gpio.h"
 
@@ -31,33 +33,42 @@
 #include <string.h>
 #include "Air_Quality.h"
 #include "yI2CprogsLCD.h"
+#include "yI2CprogsRTC.h"
+#include "ySPIprogsSD.h"
 
 //Quelle est la cible?
 //with '-fno-diagnostics-show-caret'
 #define __STR2__(x) #x
 #define __STR1__(x) __STR2__(x)
-#if defined(STM32F401xx)
-#pragma message("Compiling for NUCLEAO_F401RE")
-//Grove_LCD_RGB_Backlight rgbLCD(P0_27, P0_28);     //I2C0 SDA & SCL (I2C @ in ....LCD_RBG...h)
+
+#if defined(yPROG)
+#if defined(STM32F401xE)
+#pragma message("***************************")
+#pragma message("Compiling for NUCLEO_F401RE")
+//add specific instruction
 //----- end F401RE -----
 #elif defined(STM32G431xx)
 #pragma message("***************************")
 #pragma message("Compiling for NUCLEO_G431RB")
-#pragma message("le " __STR1__(__DATE__)" "__STR1__(__TIME__))
-#pragma message("---------------------------")
-#pragma message("program " __STR1__(yPROG))
-#pragma message("version " __STR1__(yVER))
-#pragma message("CubeMX  " __STR1__(yCubeMX))
-#pragma message("***************************\n")
-//Grove_LCD_RGB_Backlight rgbLCD(PB_9, PB_8);     	//I2C1 SDA & SCL (I2C @ in ....LCD_RBG...h)
-//----- end L476RG ------
+//add specific instruction
+//----- end G431RB ------
 #elif defined(STM32L476xx)
 #pragma message("***************************")
 #pragma message("Compiling for NUCLEO_L476RG")
+//add specific instruction
+//----- end L476RG -----
 #else
-#warning "Unknown TARGET"
-#endif
-
+#pragma message("++++++ Unknown TARGET +++++")
+#endif  //sur type board
+#pragma message("---------------------------")
+#pragma message("le " __STR1__(__DATE__) " " __STR1__(__TIME__))
+#pragma message("prog. " __STR1__(yPROG))
+#pragma message("version " __STR1__(yVER))
+#pragma message("CubeMX  " __STR1__(yCubeMX))
+#pragma message("***************************\n")
+#else
+#pragma message ("+++ Unknown program +++")
+#endif  //sur yPROG
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,8 +91,15 @@
 //Console interface (et debug print)
 uint8_t aRxBuffer[3];		//lpuart1 debug buffer de reception
 char aTxBuffer[1024];		//lpuart1 debug buffer d'emission
-uint16_t uart2NbCar;		//nb de byte attendu
+uint16_t uart2NbCar = 1;	//nb de byte attendu
 uint8_t yCarRecu;			//caractere recu (echange entre ISR uart et main)
+int yret = 9;				//code return
+char tmpBuffer[10];		    //buffer temporaire pour switch/case
+char bufferRTC[64];		//buffer pour lecture clock
+char spiBuffer[1024];				//buffer pour ecriture sur SD card
+extern char USERPath[4];   /* USER logical drive path */
+_Bool yFlagRepeatVT = false;			//flag lecture repetitive
+_Bool yFlagRepeatLCD = false;			//flag lecture repetitive
 
 /* USER CODE END PV */
 
@@ -139,10 +157,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_FATFS_Init();
   MX_TIM1_Init();
   MX_LPUART1_UART_Init();
   MX_UART4_Init();
   MX_I2C1_Init();
+  MX_SPI1_Init();
+
+  /* Initialize interrupts */
+  //MX_NVIC_Init();
+
   /* USER CODE BEGIN 2 */
 
 	/* message de bienvenue */
@@ -151,16 +175,15 @@ int main(void)
 
 	//--- test led Led on Nucleo
 	for (int ii = 0; ii < 30; ++ii) {
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(vma202LD1_GPIO_Port, vma202LD1_Pin, GPIO_PIN_SET);
 		HAL_Delay(30);
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(vma202LD1_GPIO_Port, vma202LD1_Pin, GPIO_PIN_RESET);
 		HAL_Delay(30);
 	}
 
 	//--- display welcome & menu
 	DisplayWelcome();
 	yAirQualMenu();
-	yFlagRepeatVT = 0;
 
 	//--- initialize interrupts & start uart receive it
 	uart2NbCar = 1;
@@ -173,6 +196,15 @@ int main(void)
 	yI2C_LCD_locate(0,1); yI2C_LCD_Affich_Txt(yVER);
 	yI2C_LCD_locate(7,1); yI2C_LCD_Affich_Txt(__TIME__);
 	HAL_Delay(2000);
+
+	/* mettre trace sur SD carte */
+	//avant de lancer les interrupt htim6
+	//en utilisant des buffer non interrompu
+	(void) yI2C_RTC_GetRegisters((char*)tmpBuffer, 0, 7);	//passer le buffer (via pointeur) et le nb d'éléments
+	snprintf(aTxBuffer, 1024, "*** 20%02d-%02d-%02d %02d:%02d:%02d ***\tReboot Nucleo Card with " yPROG  yVER " ("__STR1__(yCubeMX)")\n",
+		  bcdToDecimal(tmpBuffer[6]), bcdToDecimal(tmpBuffer[5]), bcdToDecimal(tmpBuffer[4]),
+		  bcdToDecimal(tmpBuffer[2]), bcdToDecimal(tmpBuffer[1]), bcdToDecimal(tmpBuffer[0]));
+	(void) ySPI_SD_Write(SDfileBoot, (TCHAR*)aTxBuffer);		// 'SDfileBoot' -> 'Nucleo.txt'
 
 	//--- petit delai final
 	HAL_Delay(500);
@@ -207,7 +239,50 @@ int main(void)
 				DisplayWelcome();
 				yAirQualMenu();
 				break;
-			case 'l': case 'L':
+
+			case 'J':	//lire carte SD 'SDfileTrace' -> 'AQK.txt'
+				snprintf(aTxBuffer, 1024, "\t*J* lire carte SD 'SDfileTrace': %d\r\n", yret);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				yret = ySPI_SD_Read(SDfileTrace);
+				snprintf(aTxBuffer, 50, "\tTemps lecture carte SD: %d ms\n", yret);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+
+			case 'K':	//ecrire sur  carte SD
+				//!! long, donc attention aux interruptions !!//		    start = HAL_GetTick(); 	// Lancement de la mesure du temps
+				//recuperer date et heure
+			    yret = yI2C_RTC_GetRegisters((char*)bufferRTC, 0, 7);	//passer le buffer (via pointeur) et le nb d'ï¿½lï¿½ments
+			    if (yret == 1) {
+					snprintf(aTxBuffer, 50, "\t*K* ecrire carte SD: %d\r\n", yret);
+					HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+			    	//decoder les 7 mots BCD
+			    	snprintf(spiBuffer, 1024, "il est 20%02d-%02d-%02d %02d:%02d:%02d\t%s",
+			    			bcdToDecimal(bufferRTC[6]), bcdToDecimal(bufferRTC[5]), bcdToDecimal(bufferRTC[4]),
+							bcdToDecimal(bufferRTC[2]), bcdToDecimal(bufferRTC[1]), bcdToDecimal(bufferRTC[0]),
+							"\ttoto is back! ecriture sur 'SDfileTrace' (trace.txt)\n");
+							//"\ttoto is back! with specific buffer\n");
+				    yret = ySPI_SD_Write(SDfileTrace, (TCHAR*)spiBuffer);
+			    }
+				snprintf(aTxBuffer, 50, "\tTemps ecriture carte SD: %d ms\n", yret);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+
+			case 'L':	//lire carte SD 'SDfileBoot' -> 'Nucleo.txt'
+				snprintf(aTxBuffer, 1024, "\t*J* lire carte SD 'SDfileBoot': %d\r\n", yret);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				yret = ySPI_SD_Read(SDfileBoot);
+				snprintf(aTxBuffer, 50, "\tTemps lecture carte SD: %d ms\n", yret);
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				break;
+
+			case 'O': case 'o':	//(re)init SPI, re int FATFS
+				snprintf(aTxBuffer, 1024, "\t*Init SPI*\r\n");
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				FATFS_UnLinkDriver(USERPath); HAL_Delay(50);
+				MX_FATFS_Init();
+				break;
+
+			case 'l': // minuscule
 				snprintf(aTxBuffer, 1024, "\tLecture continue ('l' pour arreter)" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				yFlagRepeatLCD = !yFlagRepeatLCD;
@@ -235,6 +310,17 @@ int main(void)
 				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
 
+/*
+			case 'W': case 'w':	//Ww, 87, 119
+				 passage en mode 2 touches
+				// x ? y : z // y if x is true (nonzero), else z
+				uart2NbCar = 2;
+				snprintf(aTxBuffer, 1024, "\tuart2NbCar %d\r\n", uart2NbCar);
+				HAL_UART_Transmit(&huart4,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+				//return;		//sortir du s/prog!!
+				break;
+*/
+
 			default:
 				snprintf(aTxBuffer, 1024, "\tcommande erronee" ERASELINE "\n" ERASELINE DECRC);
 				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
@@ -245,17 +331,14 @@ int main(void)
 		}
 
 		/* lecture repetitve demandee? */
-		if (yFlagRepeatVT == 1) {
-			if (yFlagTIM1 == 1) {
+		if (yFlagTIM1 == 1) {
+			if (yFlagRepeatVT) {
 				yAirQualRepeatVT();
-				yFlagTIM1 = 0; 	//reset
 			}
-		}
-		if (yFlagRepeatLCD == 1 || HAL_GPIO_ReadPin(vma202sw_GPIO_Port, vma202sw_Pin) == 1) {
-			if (yFlagTIM1 == 1) {
+			if (yFlagRepeatLCD || HAL_GPIO_ReadPin(vma202sw_GPIO_Port, vma202sw_Pin) == 1) {
 				yAirQualRepeatLCD();
-				yFlagTIM1 = 0; 	//reset
 			}
+			yFlagTIM1 = 0; 	//reset
 		}
 
 		/* check vma202 switch */
@@ -263,6 +346,7 @@ int main(void)
 		//snprintf(aTxBuffer, 4, "sw%d",HAL_GPIO_ReadPin(vma202SW_GPIO_Port, vma202SW_Pin));
 		//yI2C_LCD_locate(13,1); yI2C_LCD_Affich_Txt(aTxBuffer);
 
+		HAL_Delay(100);
 
     /* USER CODE END WHILE */
 
@@ -283,6 +367,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
@@ -300,6 +385,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+
   /** Initializes the CPU, AHB and APB buses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
@@ -330,7 +416,7 @@ void Error_Handler(void)
 	__disable_irq();
 	while (1)
 	{
-		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(vma202LD1_GPIO_Port, vma202LD1_Pin, GPIO_PIN_SET);
 	}
   /* USER CODE END Error_Handler_Debug */
 }
@@ -351,4 +437,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-

@@ -6,6 +6,7 @@
 * MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 01/04/2023	v3.3 (3.3): add yI2CprogsRTC & ySPIprogsSD folders .h .c
 le 30/03/2023	v3.2 (3-1): commit apres maj IDE & CubeMX
 							new G4 firmware rev. ajout option -fcommon sinon erreur collect2
 le 07/02/2023	v3.1c(3-1): commit avant maj IDE

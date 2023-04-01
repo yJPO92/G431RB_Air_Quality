@@ -16,6 +16,7 @@
 #define INC_AIR_QUALITY_H_
 
 //#include "main.h"
+#include <stdbool.h>
 
 /* Interface with Air Quality Kit */
 // UART4
@@ -26,8 +27,8 @@ uint8_t bRxBuffer[aqRxBufferSize];		//buffer de reception
 #define yAirQualSize 15
 uint8_t yAirQual[yAirQualSize];			//code to interface with AirQual file
 uint8_t yTempCos[yAirQualSize];
-uint8_t yFlagRepeatVT;					//flag lecture repetitive
-uint8_t yFlagRepeatLCD;					//flag lecture repetitive
+extern _Bool yFlagRepeatVT;			//flag lecture repetitive
+extern _Bool yFlagRepeatLCD;			//flag lecture repetitive
 volatile uint8_t yFlagTIM1;				//Timer TIM1 fired
 uint8_t yAirQual_Temp[5];				//stockage valeurs
 uint8_t yAirQual_eCO2[7];
@@ -47,6 +48,16 @@ uint8_t yAirQual_eCO2[7];
  0   turn off LED\n\
  r   affichage continu sur VT100\n\
  l   affichage continu sur LCD\n\
+ \t----- SPI -----\n\
+ J (lire carte SD 'AQK.txt')\n\
+ K (ecrire carte SD)\n\
+ L (lire carte SD 'Nucleo.txt')\n\
+ O (re init SPI carte SD)\n\
+ \n\
+ \t--- 2 touches ---\n\
+ HD (mise a l'heure RTC)\n\
+ ST (STart clock)\n\
+ SP (StoP clock)\n\
 ----------------------------------\n\
  Display this menu | Shutdown\n\
  Faire un choix ...\n"
