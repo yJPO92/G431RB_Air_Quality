@@ -58,7 +58,7 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define yCubeMX "3-3"
+#define yCubeMX "3-4"
 #define BP1_Pin GPIO_PIN_13
 #define BP1_GPIO_Port GPIOC
 #define BP1_EXTI_IRQn EXTI15_10_IRQn

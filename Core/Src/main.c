@@ -19,9 +19,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "fatfs.h"
+#include "app_fatfs.h"
 #include "i2c.h"
 #include "usart.h"
+#include "rtc.h"
 #include "spi.h"
 #include "tim.h"
 #include "gpio.h"
@@ -157,16 +158,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_FATFS_Init();
   MX_TIM1_Init();
   MX_LPUART1_UART_Init();
   MX_UART4_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
-
-  /* Initialize interrupts */
-  //MX_NVIC_Init();
-
+  if (MX_FATFS_Init() != APP_OK) {
+    Error_Handler();
+  }
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
 	/* message de bienvenue */
@@ -197,7 +197,8 @@ int main(void)
 	yI2C_LCD_locate(7,1); yI2C_LCD_Affich_Txt(__TIME__);
 	HAL_Delay(2000);
 
-	/* mettre trace sur SD carte */
+/*
+	 mettre trace sur SD carte
 	//avant de lancer les interrupt htim6
 	//en utilisant des buffer non interrompu
 	(void) yI2C_RTC_GetRegisters((char*)tmpBuffer, 0, 7);	//passer le buffer (via pointeur) et le nb d'éléments
@@ -205,6 +206,7 @@ int main(void)
 		  bcdToDecimal(tmpBuffer[6]), bcdToDecimal(tmpBuffer[5]), bcdToDecimal(tmpBuffer[4]),
 		  bcdToDecimal(tmpBuffer[2]), bcdToDecimal(tmpBuffer[1]), bcdToDecimal(tmpBuffer[0]));
 	(void) ySPI_SD_Write(SDfileBoot, (TCHAR*)aTxBuffer);		// 'SDfileBoot' -> 'Nucleo.txt'
+*/
 
 	//--- petit delai final
 	HAL_Delay(500);
@@ -238,6 +240,19 @@ int main(void)
 			case 'd': case 'D':		//-- re afficher le menu
 				DisplayWelcome();
 				yAirQualMenu();
+				break;
+
+			case 'I': case 'i':	//Test if I2C slave is ready
+				snprintf(aTxBuffer, 1024, "\tTest I2C LCD: @ %#X status %#x\r\n", LCD_add, yI2Ctest(LCD_add));
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+
+				HAL_Delay(1000);
+				snprintf(aTxBuffer, 1024, "\tTest I2C RBG: @ %#X status %#x\r\n", RGB_add, yI2Ctest(RGB_add));
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
+
+				HAL_Delay(1000);
+				snprintf(aTxBuffer, 1024, "\tTest I2C RTC: @ %#X status %#x\r\n", RTC_add, yI2Ctest(RTC_add));
+				HAL_UART_Transmit(&hlpuart1,(uint8_t *) aTxBuffer, strlen(aTxBuffer), 5000);
 				break;
 
 			case 'J':	//lire carte SD 'SDfileTrace' -> 'AQK.txt'
@@ -346,7 +361,7 @@ int main(void)
 		//snprintf(aTxBuffer, 4, "sw%d",HAL_GPIO_ReadPin(vma202SW_GPIO_Port, vma202SW_Pin));
 		//yI2C_LCD_locate(13,1); yI2C_LCD_Affich_Txt(aTxBuffer);
 
-		HAL_Delay(100);
+		HAL_Delay(200);
 
     /* USER CODE END WHILE */
 
@@ -371,9 +386,10 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;

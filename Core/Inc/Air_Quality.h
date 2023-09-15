@@ -53,6 +53,7 @@ uint8_t yAirQual_eCO2[7];
  K (ecrire carte SD)\n\
  L (lire carte SD 'Nucleo.txt')\n\
  O (re init SPI carte SD)\n\
+ i (test I2C)\n\
  \n\
  \t--- 2 touches ---\n\
  HD (mise a l'heure RTC)\n\

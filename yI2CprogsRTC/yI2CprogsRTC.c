@@ -11,7 +11,7 @@
 #include "stm32g4xx_hal.h"
 #include "yI2CprogsRTC.h"
 
-extern I2C_HandleTypeDef hi2c3;
+extern I2C_HandleTypeDef hi2c1;
 
 /* BCD & decimal format */
 int bcdToDecimal(int bcd) {
@@ -46,9 +46,9 @@ time_t yI2C_RTC_GetDH() {
 
     //placer le pointeur de lecture au début de la zone RTC
     buffer[0] = 0x00;
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)buffer, 1, 1000) != 0) return 0;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)buffer, 1, 1000) != 0) return 0;
     //lire date & heure
-    if (HAL_I2C_Master_Receive(&hi2c3, RTC_add|0x01, (uint8_t *)buffer, 7, 1000) != 0) return 0;
+    if (HAL_I2C_Master_Receive(&hi2c1, RTC_add|0x01, (uint8_t *)buffer, 7, 1000) != 0) return 0;
 
     //extraire info du buffer BCD recu, les mettre en decimal
     if (buffer[0] & 0x80) return 0; // clock stopped
@@ -84,7 +84,7 @@ int yI2C_RTC_WriteDH(char* buffer) {
 	data[6] = asciiToBcd(buffer[2], buffer[3]);		//mois
 	data[7] = asciiToBcd(buffer[0], buffer[1]);		//ann�e
 
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)data, 8, 1000) != 0) return 4;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)data, 8, 1000) != 0) return 4;
 
 	return 1;
 }
@@ -111,7 +111,7 @@ int yI2C_RTC_SetDH(time_t t) {
 	    //buffer[7] = decimalToBcd(now->tm_year + 1900 - 2000);
 	    buffer[7] = decimalToBcd(now->tm_year);
 	    buffer[8] = 0x00; // OUT = 0
-	    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)buffer, 9, 1000) != 0) return -1;
+	    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)buffer, 9, 1000) != 0) return -1;
 
 	    return 1;
 	}
@@ -126,7 +126,7 @@ int yI2C_RTC_start() {      // start the clock
 
     buffer[0] = 0x00;		//placer le pointeur de lecture au début de la zone RTC
     buffer[1] = 0x00;		//MZ bit7 CH ==> start clock + second = 0
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -4;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -4;
 
     return 1;
 }
@@ -141,7 +141,7 @@ int yI2C_RTC_stop() {       // stop the clock
 
     buffer[0] = 0x00;		//placer le pointeur de lecture au début de la zone RTC
     buffer[1] = 0x80;		//MU bit7 CH ==> stop clock
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -3;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -3;
 
     return 1;
 }
@@ -160,9 +160,9 @@ int yI2C_RTC_GetRegisters(char* buffer, int premElem, int nbElem) {
 	}
     //placer le pointeur de lecture au début de la zone RTC
 	data[0] = premElem;
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)data, 1, 1000) != 0) return 4;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)data, 1, 1000) != 0) return 4;
     //lire les registres
-    if (HAL_I2C_Master_Receive(&hi2c3, RTC_add|0x01, (uint8_t *)data, nbElem, 1000) != 0) return 6;
+    if (HAL_I2C_Master_Receive(&hi2c1, RTC_add|0x01, (uint8_t *)data, nbElem, 1000) != 0) return 6;
     //ranger les valeurs lues dans le buffer de transmission
 	for (int var = 0; var < nbElem; ++var) {
 		buffer[var] = data[var];
@@ -183,7 +183,7 @@ int yI2C_RTC_SetRegisters(char* buffer, int premElem, int nbElem) {
 		data[var] = buffer[var -1];
 	}
 	data[0] = premElem;	    //placer le pointeur d'écriture dans la zone RTC qui commence à l'@ 0x0A
-    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)data, nbElem + 1, 1000) != 0) return 4;
+    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)data, nbElem + 1, 1000) != 0) return 4;
     return 1;
 }
 
@@ -197,7 +197,7 @@ int yI2C_RTC_ClearRAM(int clsVal) {
 	for (int var = DS1307_RAMSTART; var <= DS1307_LASTREG; ++var) {
 	    buffer[0] = var;		//placer le pointeur
 	    buffer[1] = clsVal;		//valeur a ecrire ds le registre
-	    if (HAL_I2C_Master_Transmit(&hi2c3, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -1;
+	    if (HAL_I2C_Master_Transmit(&hi2c1, RTC_add, (uint8_t *)buffer, 2, 1000) != HAL_OK) return -1;
 	    HAL_Delay(5);
 	}
     return 1;

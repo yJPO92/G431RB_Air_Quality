@@ -27,13 +27,14 @@ FIL USERFile;       /* File object for USER */
 
 /* USER CODE END Variables */
 
-void MX_FATFS_Init(void)
+uint8_t MX_FATFS_Init(void)
 {
   /*## FatFS: Link the USER driver ###########################*/
   retUSER = FATFS_LinkDriver(&USER_Driver, USERPath);
 
   /* USER CODE BEGIN Init */
   /* additional user code for init */
+  return retUSER;
   /* USER CODE END Init */
 }
 
