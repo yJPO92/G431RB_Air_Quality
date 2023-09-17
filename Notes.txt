@@ -1,11 +1,12 @@
 *** G431_Air_Quality ***
 *
-* STM32CubeIDE v1.11.2
-* CubeMX V6.7.0
+* STM32CubeIDE v1.13.1
+* CubeMX V6.9.1
 * STM32CubeG4 Firmware Package V1.5.1
 * MonkMakes Air Quality Kit (for Raspberry Pi)
 *******
 
+le 15/09/2023	v3.4 (3.5): update CubeIDE & CubeMX
 le 01/04/2023	v3.3 (3.4): ajout module G431RB/RTC, many pb!!!!
 le 01/04/2023	v3.3 (3.3): add yI2CprogsRTC & ySPIprogsSD folders .h .c. I2C3 not available pour G431RB.
 le 30/03/2023	v3.2 (3-1): commit apres maj IDE & CubeMX

@@ -47,8 +47,8 @@
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-int32_t MX_FATFS_Init(void);
-int32_t MX_FATFS_Process(void);
+//int32_t MX_FATFS_Init(void);
+//int32_t MX_FATFS_Process(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
